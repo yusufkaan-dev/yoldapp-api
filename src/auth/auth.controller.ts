@@ -13,8 +13,14 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Login (returns accessToken + user)' })
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.auth.login(dto.email, dto.password, dto.deviceId);
+  async login(@Body() dto: LoginDto) {
+    try {
+      return await this.auth.login(dto.email, dto.password, dto.deviceId);
+    } catch (err: any) {
+      console.error('LOGIN_ERROR', err?.message || err);
+      console.error('LOGIN_STACK', err?.stack || err);
+      throw err;
+    }
   }
 
   @ApiOperation({ summary: 'Get current token payload (session validation test)' })
