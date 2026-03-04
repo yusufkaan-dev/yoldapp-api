@@ -129,7 +129,8 @@ model DriverProfile {
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   institution Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
 
-  dailyRoutes DailyRoute[]
+  dailyRoutes  DailyRoute[]
+  locationLogs LocationLog[]
 
   @@index([institutionId])
 }
@@ -163,17 +164,17 @@ model RouteStop {
   routeTemplate RouteTemplate @relation(fields: [routeTemplateId], references: [id], onDelete: Cascade)
   student       Student       @relation(fields: [studentId], references: [id], onDelete: Restrict)
 
-  @@unique([routeTemplateId, studentId]) // aynı student aynı template'e 1 kez
-  @@unique([routeTemplateId, order]) // order çakışmasın
+  @@unique([routeTemplateId, studentId])
+  @@unique([routeTemplateId, order])
   @@index([routeTemplateId])
   @@index([studentId])
 }
 
 model DailyRoute {
   id              String           @id @default(uuid())
-  date            DateTime // gün (00:00 normalize edeceğiz)
+  date            DateTime
   routeTemplateId String
-  driverId        String // DriverProfile.id
+  driverId        String
   status          DailyRouteStatus @default(PLANNED)
   startedAt       DateTime?
   finishedAt      DateTime?
@@ -182,6 +183,8 @@ model DailyRoute {
   routeTemplate RouteTemplate    @relation(fields: [routeTemplateId], references: [id], onDelete: Restrict)
   driver        DriverProfile    @relation(fields: [driverId], references: [id], onDelete: Restrict)
   stops         DailyRouteStop[]
+
+  locationLogs LocationLog[] // ✅ EKLE
 
   @@unique([routeTemplateId, driverId, date])
   @@index([date])
