@@ -1,24 +1,21 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+
 import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
+import { JwtGuard } from '../auth/jwt.guard';
 
+@ApiTags('LocationDriver')
+@ApiBearerAuth('bearer')
+@UseGuards(JwtGuard)
 @Controller('location')
 export class LocationDriverController {
   constructor(private readonly locationService: LocationService) {}
 
-  // MVP: Driver konum ping (auth/roles sonradan tekrar eklenecek)
   @Post('ping')
-  async ping(@Req() req: any, @Body() dto: CreateLocationDto) {
-    // Eğer auth varsa req.user içinden yakalar; yoksa body’den userId bekler (geçici)
-    const userId = req.user?.sub || req.user?.userId || req.user?.id || (dto as any).userId;
-
-    if (!userId) {
-      // Burada hata fırlatmak istersen ekleyebilirsin:
-      // throw new BadRequestException('Missing userId (auth not wired yet)');
-      // Şimdilik direkt servis patlatmasın diye minimal bıraktım:
-      return { ok: false, error: 'Missing userId (auth not wired yet)' };
-    }
-
+  async ping(@Req() req: Request, @Body() dto: CreateLocationDto) {
+    const userId = (req as any).user?.sub;
     return this.locationService.ingestDriverLocation(userId, dto);
   }
 }
