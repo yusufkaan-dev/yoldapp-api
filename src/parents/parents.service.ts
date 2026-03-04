@@ -1,12 +1,17 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Prisma, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateParentDto } from './dto/create-parent.dto';
 
 @Injectable()
 export class ParentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateParentDto) {
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -16,7 +21,7 @@ export class ParentsService {
         data: {
           email: dto.email,
           passwordHash,
-          role: UserRole.PARENT,
+          role: UserRole.PARENT, // eğer UserRole yoksa: role: 'PARENT' as any
         },
         select: { id: true, email: true, role: true, createdAt: true },
       });
@@ -38,7 +43,10 @@ export class ParentsService {
 
       return parent;
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
         throw new ConflictException('Email already exists');
       }
       throw new InternalServerErrorException('Failed to create parent');

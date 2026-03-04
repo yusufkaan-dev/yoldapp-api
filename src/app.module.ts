@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
+import { ParentAppModule } from './parent-app/parent-app.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -13,11 +13,18 @@ import { DriversModule } from './drivers/drivers.module';
 import { LocationModule } from './location/location.module';
 import { RoutesModule } from './routes/routes.module';
 import { DailyRoutesModule } from './daily-routes/daily-routes.module';
+import { ParentAppController } from './parent-app.controller';
 
+@Module({
+  imports: [PrismaModule],
+  controllers: [ParentAppController],
+})
+export class ParentAppModule {}
 @Module({
  imports: [
   // ... diğer modüller
   LocationModule,
+  ParentAppModule,
     PrismaModule,
     AuthModule,
     UsersModule,
