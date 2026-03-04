@@ -10,12 +10,14 @@ import { InstitutionsModule } from './institutions/institutions.module';
 import { ParentsModule } from './parents/parents.module';
 import { StudentsModule } from './students/students.module';
 import { DriversModule } from './drivers/drivers.module';
-
+import { LocationModule } from './location/location.module';
 import { RoutesModule } from './routes/routes.module';
 import { DailyRoutesModule } from './daily-routes/daily-routes.module';
 
 @Module({
-  imports: [
+ imports: [
+  // ... diğer modüller
+  LocationModule,
     PrismaModule,
     AuthModule,
     UsersModule,
