@@ -7,8 +7,6 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
-console.error('UNHANDLED_EXCEPTION', exception);
-console.error('STACK', (exception as any)?.stack);
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
