@@ -7,13 +7,16 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
-
+console.error('UNHANDLED_EXCEPTION', exception);
+console.error('STACK', (exception as any)?.stack);
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+    console.error(exception);
+    console.error((exception as any)?.stack || exception);
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string | string[] = 'Internal server error';
