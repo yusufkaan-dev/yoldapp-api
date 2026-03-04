@@ -1,0 +1,836 @@
+
+
+====================
+1) SYSTEM INFO
+====================
+
+
+
+----- CMD: node -v -----
+node -v
+
+v24.13.1
+
+
+----- CMD: npm -v -----
+npm -v
+
+11.8.0
+
+
+----- CMD: npx prisma -v -----
+npx prisma -v
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+prisma                  : 6.19.2
+@prisma/client          : 6.19.2
+Computed binaryTarget   : windows
+Operating System        : win32
+Architecture            : x64
+Node.js                 : v24.13.1
+TypeScript              : 5.9.3
+Query Engine (Node-API) : libquery-engine c2990dca591cba766e3b7ef5d9e8a84796e47ab7 (at node_modules\@prisma\engines\query_engine-windows.dll.node)
+PSL                     : @prisma/prisma-schema-wasm 7.1.1-3.c2990dca591cba766e3b7ef5d9e8a84796e47ab7
+Schema Engine           : schema-engine-cli c2990dca591cba766e3b7ef5d9e8a84796e47ab7 (at node_modules\@prisma\engines\schema-engine-windows.exe)
+Default Engines Hash    : c2990dca591cba766e3b7ef5d9e8a84796e47ab7
+Studio                  : 0.511.0
+
+
+----- CMD: nest --version -----
+bash -lc nest --version || true
+
+bash: line 1: nest: command not found
+
+
+====================
+1) DOCKER
+====================
+
+
+
+----- CMD: docker ps -----
+docker ps
+
+CONTAINER ID   IMAGE         COMMAND                  CREATED       STATUS       PORTS                                         NAMES
+fb7e22f46f75   postgres:16   "docker-entrypoint.s…"   4 hours ago   Up 4 hours   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp   yoldapp-postgres
+a341202880c2   redis:7       "docker-entrypoint.s…"   4 hours ago   Up 4 hours   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp   yoldapp-redis
+
+
+----- CMD: docker ps formatted -----
+bash -lc docker ps --format "table {{.Names}}	{{.Image}}	{{.Ports}}	{{.Status}}"
+
+NAMES              IMAGE         PORTS                                         STATUS
+yoldapp-postgres   postgres:16   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp   Up 4 hours
+yoldapp-redis      redis:7       0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp   Up 4 hours
+
+
+----- CMD: docker images (postgres/redis) -----
+bash -lc docker images | grep -E "postgres|redis" || docker images
+
+WARNING: This output is designed for human readability. For machine-readable output, please use --format.
+postgres:16   e4842c8a99ca        641MB          166MB   U    
+redis:7       976ab0f0939b        175MB         47.4MB   U    
+
+
+====================
+2) PROJECT TREE (tree -L 4)
+====================
+
+
+
+----- CMD: pwd -----
+pwd
+
+/c/Users/yeekko/yoldapp/api
+
+
+----- CMD: tree -L 4 -----
+bash -lc tree -L 4 || echo "tree not installed. Use: dir /s /b (CMD) or install tree."
+
+bash: line 1: tree: command not found
+tree not installed. Use: dir /s /b (CMD) or install tree.
+
+
+====================
+3) CONFIG FILES
+====================
+
+
+
+----- FILE: package.json -----
+
+{
+  "name": "api",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/platform-express": "^11.0.1",
+    "@prisma/client": "^6.19.2",
+    "bcrypt": "^6.0.0",
+    "prisma": "^6.19.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.18.0",
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.1",
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.10.7",
+    "@types/supertest": "^6.0.2",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^16.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.4.2",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
+
+
+----- FILE: tsconfig.json -----
+
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
+
+
+----- FILE: nest-cli.json -----
+
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "deleteOutDir": true
+  }
+}
+
+
+----- FILE: .env -----
+
+DATABASE_URL="postgresql://yoldapp:yoldapp@localhost:5432/yoldapp?schema=public"
+JWT_SECRET="dev_secret_change_me"
+
+====================
+4) PRISMA
+====================
+
+
+
+----- FILE: prisma/schema.prisma -----
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  DRIVER
+  PARENT
+  INSTITUTION
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  role         UserRole
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+----- CMD: prisma migrations list -----
+bash -lc ls -1 prisma/migrations 2>/dev/null || echo "(no prisma/migrations folder)"
+
+20260220215356_init
+20260220221433_add_auth_fields
+migration_lock.toml
+
+
+----- CMD: npx prisma generate -----
+npx prisma generate
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to .\node_modules\@prisma\client in 107ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+
+====================
+5) DOCKER COMPOSE
+====================
+
+
+
+----- FILE: docker-compose.yml -----
+
+(MISSING)
+
+
+====================
+6) NEST GLOBAL WIRING
+====================
+
+
+
+----- FILE: src/main.ts -----
+
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+
+
+----- FILE: src/app.module.ts -----
+
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { PrismaModule } from './prisma/prisma.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+
+@Module({
+  imports: [PrismaModule, UsersModule, AuthModule],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+====================
+7) PRISMA SERVICE
+====================
+
+
+
+----- FILE: src/prisma/prisma.service.ts -----
+
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
+}
+
+----- FILE: src/prisma/prisma.module.ts -----
+
+import { Global, Module } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+
+@Global()
+@Module({
+  providers: [PrismaService],
+  exports: [PrismaService],
+})
+export class PrismaModule {}
+
+====================
+8) AUTH MODULE
+====================
+
+
+
+----- FILE: src/auth/auth.module.ts -----
+
+import { Global, Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+
+@Global()
+@Module({
+  imports: [
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1d' },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService],
+  exports: [JwtModule], // 🔥 JwtService her yerde kullanılabilsin
+})
+export class AuthModule {}
+
+----- FILE: src/auth/auth.controller.ts -----
+
+import { Body, Controller, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private auth: AuthService) {}
+
+  @Post('login')
+  login(@Body() body: { email: string; password: string }) {
+    return this.auth.login(body.email, body.password);
+  }
+}
+
+----- FILE: src/auth/auth.service.ts -----
+
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+
+@Injectable()
+export class AuthService {
+  constructor(private prisma: PrismaService, private jwt: JwtService) {}
+
+  async login(email: string, password: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) throw new UnauthorizedException('Invalid credentials');
+
+    const accessToken = await this.jwt.signAsync({
+      sub: user.id,
+      role: user.role,
+      email: user.email,
+    });
+
+    return { accessToken, user: { id: user.id, email: user.email, role: user.role } };
+  }
+}
+
+----- FILE: src/auth/jwt.strategy.ts -----
+
+(MISSING)
+
+
+----- FILE: src/auth/jwt.guard.ts -----
+
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
+@Injectable()
+export class JwtGuard implements CanActivate {
+  constructor(private jwt: JwtService) {}
+
+  async canActivate(context: ExecutionContext) {
+    const req = context.switchToHttp().getRequest();
+
+    const auth = req.headers['authorization'];
+    if (!auth || typeof auth !== 'string') throw new UnauthorizedException('Missing Authorization header');
+
+    const [type, token] = auth.split(' ');
+    if (type !== 'Bearer' || !token) throw new UnauthorizedException('Invalid Authorization header');
+
+    try {
+      const payload = await this.jwt.verifyAsync(token, { secret: process.env.JWT_SECRET });
+      req.user = payload; // { sub, role, email }
+      return true;
+    } catch {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+}
+
+----- FILE: src/auth/roles.guard.ts -----
+
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { ROLES_KEY } from './roles.decorator';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext) {
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (!requiredRoles?.length) return true;
+
+    const req = context.switchToHttp().getRequest();
+    const role = req.user?.role;
+
+    if (!role || !requiredRoles.includes(role)) {
+      throw new ForbiddenException('Insufficient role');
+    }
+
+    return true;
+  }
+}
+
+----- FILE: src/auth/roles.decorator.ts -----
+
+import { SetMetadata } from '@nestjs/common';
+
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+
+----- FILE: src/auth/constants.ts -----
+
+(MISSING)
+
+
+----- FILE: src/auth/config.ts -----
+
+(MISSING)
+
+
+====================
+9) USERS MODULE
+====================
+
+
+
+----- FILE: src/users/users.module.ts -----
+
+import { Module } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+
+@Module({
+  providers: [UsersService],
+  controllers: [UsersController]
+})
+export class UsersModule {}
+
+
+----- FILE: src/users/users.controller.ts -----
+
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { UserRole } from '@prisma/client';
+import { UsersService } from './users.service';
+import { JwtGuard } from '../auth/jwt.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+
+@Controller('users')
+export class UsersController {
+  constructor(private usersService: UsersService) {}
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post()
+  create(@Body() body: { email: string; password: string; role: UserRole }) {
+    return this.usersService.create(body.email, body.password, body.role);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+}
+
+----- FILE: src/users/users.service.ts -----
+
+import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+import { Prisma, UserRole } from '@prisma/client';
+
+@Injectable()
+export class UsersService {
+  constructor(private prisma: PrismaService) {}
+
+  async create(email: string, password: string, role: UserRole) {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    try {
+      return await this.prisma.user.create({
+        data: { email, passwordHash, role },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true,
+        },
+      });
+    } catch (e) {
+      // Unique constraint: email already exists
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+        throw new ConflictException('Email already exists');
+      }
+
+      // You can expand this later for other Prisma codes (P2003 FK, etc.)
+      throw new InternalServerErrorException('Failed to create user');
+    }
+  }
+
+  async findAll() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+}
+
+====================
+9) USERS DTO FOLDER (if exists)
+====================
+
+
+
+----- CMD: list dto folder -----
+bash -lc ls -la src/users/dto 2>/dev/null || echo "(no src/users/dto folder)"
+
+(no src/users/dto folder)
+
+
+====================
+10) CURL EXAMPLES (copy-paste)
+====================
+
+# 10) WORKING ENDPOINT EXAMPLES (curl)
+
+# 1) Login (ADMIN) -> copy accessToken from response
+curl -i -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@yoldapp.local","password":"Admin123!"}'
+
+# 2) GET /users (with token)
+# replace TOKEN with your accessToken
+curl -i http://localhost:3000/users \
+  -H "Authorization: Bearer TOKEN"
+
+# 3) POST /users (ADMIN token) success
+curl -i -X POST http://localhost:3000/users \
+  -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"parent1@yoldapp.local","password":"Parent123!","role":"PARENT"}'
+
+# 4) POST /users same email again -> expect 409 Conflict
+curl -i -X POST http://localhost:3000/users \
+  -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"parent1@yoldapp.local","password":"Parent123!","role":"PARENT"}'
+
+
+====================
+11) WHERE WE ARE / NEXT
+====================
+
+Current status:
+- NestJS + Prisma + Postgres(Docker) running
+- User model with enum UserRole (ADMIN/DRIVER/PARENT/INSTITUTION)
+- Auth/login works and returns JWT accessToken
+- /users endpoints protected by Jwt + Roles (ADMIN-only)
+- POST /users:
+  - 201 on new email
+  - 409 on duplicate email (ConflictException)
+- passwordHash not returned in API responses (select fields)
+
+Next steps (MVP):
+1) DTO + Validation (class-validator, ValidationPipe)
+2) Device/session limits (Parent max 2, Driver max 1) via UserSession table and login policy
+3) Domain entities: Institution, Driver, Parent, Student, Vehicle, Route, DailyRoute, Attendance, LocationLog, Notification, TemporaryStop
+4) Admin CRUD endpoints (create institution/driver/parent/student/vehicle/route)
+5) Driver location logging (5s) + realtime layer later (Socket/Firebase)
+
+
+====================
+1) SYSTEM INFO
+====================
+
+
+
+----- CMD: node -v -----
+node -v
+
+v24.13.1
+
+
+----- CMD: npm -v -----
+npm -v
+
+11.8.0
+
+
+----- CMD: npx prsma -v -----
+npx prsma -v
+
+npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/prsma - Not found
+npm error 404
+npm error 404  The requested resource 'prsma@*' could not be found or you do not have permission to access it.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+npm error A complete log of this run can be found in: C:\Users\yeekko\AppData\Local\npm-cache\_logs\2026-02-21T00_50_48_576Z-debug-0.log
+
+
+----- CMD: nest --verson -----
+bash -lc nest --verson  true
+
+bash: line 1: nest: command not found
+
+
+====================
+1) DOCKER
+====================
+
+
+
+----- CMD: docker ps -----
+docker ps
+
+CONTAINER ID   IMAGE         COMMAND                  CREATED       STATUS       PORTS                                         NAMES
+fb7e22f46f75   postgres:16   "docker-entrypoint.s…"   4 hours ago   Up 4 hours   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp   yoldapp-postgres
+a341202880c2   redis:7       "docker-entrypoint.s…"   4 hours ago   Up 4 hours   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp   yoldapp-redis
+
+
+----- CMD: docker ps formatted -----
+bash -lc docker ps --format "table .Namest.Imaget.Portst.Status"
+
+.Namest.Imaget.Portst.Status
+.Namest.Imaget.Portst.Status
+.Namest.Imaget.Portst.Status
+
+
+----- CMD: docker mages (postgres/reds) -----
+bash -lc docker mages  grep -E "postgresreds"  docker mages
+
+unknown shorthand flag: 'E' in -E
+
+Usage:  docker [OPTIONS] COMMAND [ARG...]
+
+Run 'docker --help' for more information
+
+
+====================
+2) PROJECT TREE (tree -L 4)
+====================
+
+
+
+----- CMD: pwd -----
+pwd
+
+/c/Users/yeekko/yoldapp/api
+
+
+----- CMD: tree -L 4 -----
+bash -lc tree -L 4  echo "tree not nstalled. Use: dr /s /b (CMD) or nstall tree."
+
+bash: line 1: tree: command not found
+
+
+====================
+3) CONFIG FILES
+====================
+
+
+
+====================
+4) PRISMA
+====================
+
+
+
+----- CMD: prsma mgratons lst -----
+bash -lc ls -1 prsma/mgratons 2/dev/null  echo "(no prsma/mgratons folder)"
+
+ls: cannot access 'prsma/mgratons': No such file or directory
+ls: cannot access '2/dev/null': No such file or directory
+ls: cannot access 'echo': No such file or directory
+ls: cannot access '(no prsma/mgratons folder)': No such file or directory
+
+
+----- CMD: npx prsma generate -----
+npx prsma generate
+
+npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/prsma - Not found
+npm error 404
+npm error 404  The requested resource 'prsma@*' could not be found or you do not have permission to access it.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+npm error A complete log of this run can be found in: C:\Users\yeekko\AppData\Local\npm-cache\_logs\2026-02-21T00_51_15_038Z-debug-0.log
+
+
+====================
+5) DOCKER COMPOSE
+====================
+
+
+
+====================
+6) NEST GLOBAL WIRING
+====================
+
+
+
+====================
+7) PRISMA SERVICE
+====================
+
+
+
+====================
+8) AUTH MODULE
+====================
+
+
+
+====================
+9) USERS MODULE
+====================
+
+
+
+====================
+9) USERS DTO FOLDER (f exsts)
+====================
+
+
+
+----- CMD: lst dto folder -----
+bash -lc ls -la src/users/dto 2/dev/null  echo "(no src/users/dto folder)"
+
+ls: cannot access 'src/users/dto': No such file or directory
+ls: cannot access '2/dev/null': No such file or directory
+ls: cannot access 'echo': No such file or directory
+ls: cannot access '(no src/users/dto folder)': No such file or directory
+
+
+====================
+10) CURL EXAMPLES (copy-paste)
+====================
+

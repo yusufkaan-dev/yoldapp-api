@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  DRIVER
+  PARENT
+  INSTITUTION
+}
+
+enum RouteDirection {
+  AM
+  PM
+}
+
+enum DailyRouteStatus {
+  PLANNED
+  STARTED
+  FINISHED
+  CANCELED
+}
+
+enum DailyStopType {
+  NORMAL
+  TEMPORARY
+}
+
+enum DailyStopStatus {
+  PENDING
+  SKIPPED
+  BOARDED
+  DROPPED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  role         UserRole
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  userSessions  UserSession[]
+  parentProfile ParentProfile?
+  driverProfile DriverProfile?
+}
+
+model UserSession {
+  id        String    @id @default(uuid())
+  userId    String
+  deviceId  String
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@index([userId])
+}
+
+model Institution {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  parents  ParentProfile[]
+  students Student[]
+  drivers  DriverProfile[]
+
+  routeTemplates RouteTemplate[]
+}
+
+model ParentProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  institutionId String
+  fullName      String
+  phone         String?
+  createdAt     DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+
+  students StudentParent[]
+
+  @@index([institutionId])
+}
+
+model Student {
+  id            String   @id @default(uuid())
+  institutionId String
+  firstName     String
+  lastName      String
+  createdAt     DateTime @default(now())
+
+  institution     Institution      @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  parents         StudentParent[]
+  routeStops      RouteStop[]
+  dailyRouteStops DailyRouteStop[]
+
+  @@index([institutionId])
+}
+
+model StudentParent {
+  studentId String
+  parentId  String
+  createdAt DateTime @default(now())
+
+  student Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  parent  ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@id([studentId, parentId])
+  @@index([parentId])
+}
+
+model DriverProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  institutionId String
+  fullName      String
+  phone         String?
+  createdAt     DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+
+  dailyRoutes DailyRoute[]
+
+  @@index([institutionId])
+}
+
+model RouteTemplate {
+  id            String         @id @default(uuid())
+  institutionId String
+  name          String
+  direction     RouteDirection
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+
+  institution Institution  @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  stops       RouteStop[]
+  dailyRoutes DailyRoute[]
+
+  @@index([institutionId])
+  @@index([institutionId, isActive])
+}
+
+model RouteStop {
+  id              String   @id @default(uuid())
+  routeTemplateId String
+  studentId       String
+  order           Int
+  plannedTime     String? // "07:35" gibi
+  lat             Decimal? @db.Decimal(10, 7)
+  lng             Decimal? @db.Decimal(10, 7)
+  createdAt       DateTime @default(now())
+
+  routeTemplate RouteTemplate @relation(fields: [routeTemplateId], references: [id], onDelete: Cascade)
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Restrict)
+
+  @@unique([routeTemplateId, studentId]) // aynı student aynı template'e 1 kez
+  @@unique([routeTemplateId, order]) // order çakışmasın
+  @@index([routeTemplateId])
+  @@index([studentId])
+}
+
+model DailyRoute {
+  id              String           @id @default(uuid())
+  date            DateTime // gün (00:00 normalize edeceğiz)
+  routeTemplateId String
+  driverId        String // DriverProfile.id
+  status          DailyRouteStatus @default(PLANNED)
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  createdAt       DateTime         @default(now())
+
+  routeTemplate RouteTemplate    @relation(fields: [routeTemplateId], references: [id], onDelete: Restrict)
+  driver        DriverProfile    @relation(fields: [driverId], references: [id], onDelete: Restrict)
+  stops         DailyRouteStop[]
+
+  @@unique([routeTemplateId, driverId, date])
+  @@index([date])
+  @@index([driverId, date])
+}
+
+model DailyRouteStop {
+  id           String          @id @default(uuid())
+  dailyRouteId String
+  studentId    String
+  order        Int
+  type         DailyStopType   @default(NORMAL)
+  status       DailyStopStatus @default(PENDING)
+  lat          Decimal?        @db.Decimal(10, 7)
+  lng          Decimal?        @db.Decimal(10, 7)
+  createdAt    DateTime        @default(now())
+
+  dailyRoute DailyRoute @relation(fields: [dailyRouteId], references: [id], onDelete: Cascade)
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Restrict)
+
+  @@unique([dailyRouteId, studentId])
+  @@unique([dailyRouteId, order])
+  @@index([dailyRouteId])
+  @@index([studentId])
+}
+
+model LocationLog {
+  id           String   @id @default(uuid())
+  driverId     String
+  dailyRouteId String?
+  lat          Float
+  lng          Float
+  speed        Float?
+  heading      Float?
+  createdAt    DateTime @default(now())
+
+  driver     DriverProfile @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  dailyRoute DailyRoute?   @relation(fields: [dailyRouteId], references: [id], onDelete: SetNull)
+
+  @@index([driverId])
+  @@index([dailyRouteId])
+  @@index([createdAt])
+}
