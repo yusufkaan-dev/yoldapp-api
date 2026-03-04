@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { PrismaClient, UserRole } = require('@prisma/client');
 
 const prisma = new PrismaClient();
